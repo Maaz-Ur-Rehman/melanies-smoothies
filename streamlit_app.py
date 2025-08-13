@@ -33,14 +33,11 @@ if ingredients_list and name_on_order.strip():
     st.write("You chose:", ingredients_list)
 
     # 🥋 Create the INGREDIENTS_STRING variable as an empty string
-    ingredients_string = ''
+    ingredients_string = ""
 
-    # 🥋 Add the FOR LOOP block
+    # 🥋 Add the FOR LOOP block (concatenate with no spaces or commas)
     for fruit_chosen in ingredients_list:
-        ingredients_string += fruit_chosen + ' '
-
-    # Remove the trailing space
-    ingredients_string = ingredients_string.strip()
+        ingredients_string += fruit_chosen
 
     # 🥋 Output the string
     st.write(ingredients_string)
