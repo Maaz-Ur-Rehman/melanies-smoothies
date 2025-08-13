@@ -32,14 +32,12 @@ ingredients_list = st.multiselect(
 if ingredients_list and name_on_order.strip():
     st.write("You chose:", ingredients_list)
 
-    # 🥋 Create the INGREDIENTS_STRING variable as an empty string
-    ingredients_string = ""
-
-    # 🥋 Add the FOR LOOP block (concatenate with no spaces or commas)
+    # Create INGREDIENTS_STRING variable (no spaces between fruits)
+    ingredients_string = ''
     for fruit_chosen in ingredients_list:
-        ingredients_string += fruit_chosen
+        ingredients_string += fruit_chosen.replace(" ", "")
 
-    # 🥋 Output the string
+    # Output the string
     st.write(ingredients_string)
 
     # Submit order
