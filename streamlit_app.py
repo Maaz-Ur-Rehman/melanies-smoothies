@@ -1,5 +1,6 @@
 # Import python packages
 import streamlit as st
+import pandas as pd   # ✅ NEW
 import requests
 from snowflake.snowpark.functions import col
 
@@ -15,9 +16,14 @@ st.write('The name on your Smoothie will be:', name_on_order)
 cnx = st.connection("snowflake")
 session = cnx.session()
 
-# Fetch fruit options from Snowflake and convert to Python list
-fruit_df = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'))
-fruit_list = [row['FRUIT_NAME'] for row in fruit_df.collect()]
+# ✅ Fetch FRUIT_NAME and SEARCH_ON from Snowflake
+fruit_df = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'), col('SEARCH_ON'))
+
+# ✅ Convert Snowpark DataFrame to Pandas DataFrame
+pd_df = fruit_df.to_pandas()
+
+# ✅ Fruit list for multiselect comes from FRUIT_NAME column
+fruit_list = pd_df['FRUIT_NAME'].tolist()
 
 # Multi-select box for ingredients
 ingredients_list = st.multiselect(
@@ -43,11 +49,11 @@ if ingredients_list and name_on_order.strip():
 elif st.button('Submit Order'):
     st.error("Please select at least one ingredient and enter a name for your smoothie.")
 
-# Show nutrition info for each chosen fruit
+# ✅ Show nutrition info using SEARCH_ON values
 if ingredients_list:
-    ingredients_string = ''
     for fruit_chosen in ingredients_list:
-        ingredients_string += fruit_chosen + ' '
-        st.subheader(fruit_chosen + ' Nutrition Information')
-        smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/" + fruit_chosen)
+        search_on = pd_df.loc[pd_df['FRUIT_NAME'] == fruit_chosen, 'SEARCH_ON'].iloc[0]
+        st.write(f"The search value for {fruit_chosen} is {search_on}.")
+        
+        smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/" + search_on)
         st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
